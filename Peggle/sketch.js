@@ -11,7 +11,6 @@ let pegsh =stdPegs;
 let bas = stdPegs * pxBredd;
 
 var image = new Image();
-//image.src = ;
 
 var btn2 = document.getElementById('btn2');                     // Open file button
 var btnpeg = document.getElementById('btnpeg');                 // Open file button
@@ -39,10 +38,39 @@ var mstartX = 0;
 var mstartY = 0;
 
 //-------- colors section -----------------
-const colors =[ {r: 125, g:125,b:100}   ];
+//const colors =[ {r: 125, g:125,b:100}   ];
  
-//-----------------------------------------
 
+
+//-----------------------------------------
+// Table
+
+//create a Table Object
+let table = document.getElementById('colors');
+//iterate over every array(row) within tableArr
+for (let row of baseColors) {
+//Insert a new row element into the table element
+  table.insertRow();
+
+  let newCell1 = table.rows[table.rows.length - 1].insertCell();
+
+  newCell1.textContent = row.name;
+    
+  let newCell2 = table.rows[table.rows.length - 1].insertCell();
+
+  newCell2.textContent = row.hex;
+
+  let newCell3 = table.rows[table.rows.length - 1].insertCell();
+
+  newCell3.style.backgroundColor = row.hex;
+
+
+  newCell3.style.padding = 10;
+
+  
+}
+
+// ----------------------------------------
 //------------------------
 
 btn1platta.addEventListener("click", function() {         // Denna triggar file browser vid klick på knapp
@@ -91,14 +119,17 @@ btn2.addEventListener("click", function() {         // Denna triggar file browse
 
 btnzoompos.addEventListener("click", function() {         // Denna triggar file browser vid klick på knapp
   console.log("Klick zoom pos");
-  currScale = currScale + 1;
+  currScale = currScale + 0.1;
   ScaleAndRedraw();
   
 });
 
 btnzoomneg.addEventListener("click", function() {         // Denna triggar file browser vid klick på knapp
   console.log("Klick zoom neg");
-  currScale = currScale - 0.5;
+  currScale = currScale - 0.1;
+  if (currScale <= 0.01){
+    currScale = 0.1;
+  }
 
   ScaleAndRedraw();
 });
@@ -138,7 +169,7 @@ function pegIt(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Loggelilogg
-  console.log(pixels);
+  //console.log(pixels);
 
   var pixelation_level = bas / stdPegs;
 
@@ -147,6 +178,7 @@ function pegIt(){
 
   for (let x = 0; x < canvas.width; x += pixelation_level) {
     for (let y = 0; y < canvas.height; y += pixelation_level) {
+      let trueColors = false;
 
       let i = (x + y * canvas.width) * 4;
 
@@ -155,12 +187,29 @@ function pegIt(){
       let b = pixels.data[i + 2];
       let a = pixels.data[i + 3];
 
-      let startPeg = pixelation_level / 2;
+      console.log("px" + r +" "+g+" "+b+" "+a);
 
+      let startPeg = pixelation_level / 2; // Offset to get first peg correct
+
+      if (a == 0) {
+        r = 255;
+        g = 255;
+        b = 255;
+      }
+
+      let picColor = rgbToHex(r,g,b);
+      let choosenColor = nearestColor(picColor);
+
+      console.log("Found: " + picColor + " Chose: " + choosenColor.hex + " " + choosenColor.name);
+      
+
+      // --------- Background for peg - White square ------------
       ctx.fillStyle = 'white';
       ctx.fillRect(x, y, pixelation_level,pixelation_level);
+     // ---------------------------------------------------------
      
-      // Draw peg with color.
+     if (trueColors){
+     // --------- Draw peg - True color. -----------------------
       ctx.beginPath();
       ctx.fillStyle = 'rgba('+r+', '+g+', '+b+', '+a+')';
       ctx.strokeStyle = 'rgba('+r+', '+g+', '+b+', '+a+')';
@@ -168,9 +217,24 @@ function pegIt(){
       ctx.arc(x+startPeg, y+startPeg, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.stroke();
-      
+      // ---------------------------------------------------------      
+     }
 
-      // Draw small peg to locate center with gray color.
+     if (!trueColors) {
+
+      var newrgb = hexToRgb(choosenColor.hex);
+
+      // --------- Draw peg - Choosen color. -----------------------
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba('+newrgb.r+', '+newrgb.g+', '+newrgb.b+',1)';
+      ctx.strokeStyle = 'rgba('+newrgb.r+', '+newrgb.g+', '+newrgb.b+',1)';
+      ctx.lineWidth = 2;
+      ctx.arc(x+startPeg, y+startPeg, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
+      ctx.fill();
+      ctx.stroke();
+      // ---------------------------------------------------------  
+     }
+      // ----- Draw small peg to locate center with gray color.--
       ctx.beginPath();
       ctx.fillStyle = 'gray';
       ctx.strokeStyle = 'gray';
@@ -178,7 +242,7 @@ function pegIt(){
       ctx.arc(x+startPeg, y+startPeg, pixelation_level/6, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.stroke();
-    
+    // ---------------------------------------------------------
     }
   }
 };
@@ -275,3 +339,66 @@ image.addEventListener('load', function(){
 //-----------------------------------------------------------
         
 });
+
+
+//--------- color functions --------------------
+console.log("nearest.js loaded");
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+// from https://stackoverflow.com/a/5624139
+ function hexToRgb( hex) {
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.toString().replace(shorthandRegex, function(m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
+
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+} 
+
+/* function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+ */
+// Distance between 2 colors (in RGB)
+// https://stackoverflow.com/questions/23990802/find-nearest-color-from-a-colors-list
+function distance(a, b) {
+    return Math.sqrt(Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2));
+}
+
+// return nearest color from array
+function nearestColor(colorHex){
+  var lowest = Number.POSITIVE_INFINITY;
+  var tmp;
+  let index = 0;
+  baseColors.forEach( (el, i) => {
+      tmp = distance(hexToRgb(colorHex), hexToRgb(el.hex))
+      if (tmp < lowest) {
+        lowest = tmp;
+        index = i;
+      };
+      
+  })
+  return baseColors[index];
+  
+}
+
+console.log(nearestColor("#FFFFFF")); 
+// ---------------------------------------------
