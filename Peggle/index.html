@@ -9,23 +9,30 @@
   <body>
     <div id="btndiv" class="btn-group">
       <button Id="btn2">Välj bild  asfdef</button>
-      
       <button Id="btnpeg">PegIt</button>
     </div>
 
-    <div id="btndiv2" class="btn-group">
-      <button Id="btn1platta">1 platta</button>
-      <button Id="btn2platta">2 platta</button>
+      <div id="topdiv1" class="btn-groupBox">
+        <button Id="btn1platta">1 platta</button>
+        <button Id="btn2platta">2 platta</button>
+      </div>
+      <div id="topdiv2" class="btn-groupBox">
       <button Id="btn3platta">3 platta</button>
       <button Id="btn4platta">4 platta</button>
-    </div>
+      </div>
     <div id="btndiv3" class="btn-group">
       <button Id="btnzoompos">+</button>
       <button Id="btnzoomneg">-</button>
     </div>
 
     <input id="file-input" type="file" name="name" style="display: none;" />
-    <canvas id="canvas1"></canvas>  
+    <div id="divcanvas" >
+      <canvas id="canvas1"></canvas> 
+    </div>
+ 
+
+
+
 
     <script type="text/javascript" src="sketch.js"></script>
   </body>

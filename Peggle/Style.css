@@ -6,12 +6,20 @@
 body {
   background: rgb(156, 156, 156);
 }
+
 canvas {
-    position: absolute;
-    top: 50%;
+    /*position: absolute;
+    top: 60%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); */
     border: 1px solid black;
+
+}
+
+#divcanvas {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px; 
 }
 
  #btndiv {
@@ -33,6 +41,12 @@ canvas {
     display: flex;
     justify-content: center;
 } 
+
+#btncontainer,#topdiv1,#topdiv2{
+  display: flex;
+  justify-content: center;
+} 
+
 
 
 footer {
@@ -75,5 +89,25 @@ footer a {
   
   /* Add a background color on hover */
   .btn-group button:hover {
+    background-color: #3e8e41;
+  }
+
+
+  .btn-groupBox button {
+    background-color: #04AA6D; /* Green background */
+    border: 1px solid green; /* Green border */
+    color: white; /* White text */
+    padding: 10px 24px; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    width: 20%; /* Set a width if needed */
+    display: block; /* Make the buttons appear below each other */
+  }
+  
+  .btn-groupBox button:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+  }
+  
+  /* Add a background color on hover */
+  .btn-groupBox button:hover {
     background-color: #3e8e41;
   }
