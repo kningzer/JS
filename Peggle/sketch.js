@@ -30,17 +30,18 @@ canvas.width = bas;
 canvas.height = bas;
 var offsetX=canvas.offsetLeft;                                  // Offset for dragging
 var offsetY=canvas.offsetTop;                                   // offset for dragging
-
 var currScale = 1;
-
 var currImgX = 0;
 var currImgY = 0;
-
 var moveXAmount = 0;
 var moveYAmount = 0;
-
 var mstartX = 0;
 var mstartY = 0;
+
+//-------- colors section -----------------
+const colors =[ {r: 125, g:125,b:100}   ];
+ 
+//-----------------------------------------
 
 //------------------------
 

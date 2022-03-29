@@ -17,7 +17,7 @@ canvas {
 }
 
 #divcanvas {
-  display: flex;
+  display:flex;
   justify-content: center;
   padding-top: 10px; 
 }
@@ -110,4 +110,13 @@ footer a {
   /* Add a background color on hover */
   .btn-groupBox button:hover {
     background-color: #3e8e41;
+  }
+
+  .colortable{
+    margin-right: 50px;
+  }
+
+  #tablediv {
+    float: left;
+    padding: 10px 24px; /* Some padding */
   }
