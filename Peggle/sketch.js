@@ -12,6 +12,7 @@ let bas = stdPegs * pxBredd;
 
 var image = new Image();
 
+var btnFunky = document.getElementById('btnFunky');           // Extra function button
 var btn2 = document.getElementById('btn2');                     // Open file button
 var btnpeg = document.getElementById('btnpeg');                 // Open file button
 var btnzoompos = document.getElementById('btnzoompos');         // Open file button
@@ -38,47 +39,38 @@ var mstartX = 0;
 var mstartY = 0;
 
 //-------- colors section -----------------
-//const colors =[ {r: 125, g:125,b:100}   ];
- 
-
 
 //-----------------------------------------
-// Table
 
-//create a Table Object
+//create a Table with available colors
 let table = document.getElementById('colors');
-//iterate over every array(row) within tableArr
 for (let row of baseColors) {
-//Insert a new row element into the table element
+
   table.insertRow();
-
   let newCell1 = table.rows[table.rows.length - 1].insertCell();
-
   newCell1.textContent = row.name;
-    
   let newCell2 = table.rows[table.rows.length - 1].insertCell();
-
   newCell2.textContent = row.hex;
-
   let newCell3 = table.rows[table.rows.length - 1].insertCell();
-
   newCell3.style.backgroundColor = row.hex;
-
-
-  newCell3.style.padding = 10;
-
-  
+  newCell3.style.padding = 10;  
 }
-
 // ----------------------------------------
-//------------------------
+
+//-----------------------------------------
+
+
+
+btnFunky.addEventListener("click", function() {           // Gör lite vad som helst knapp
+  drawGrid();
+});
 
 btn1platta.addEventListener("click", function() {         // Denna triggar file browser vid klick på knapp
   console.log("platta 1 event"); 
   canvas.width = bas;
   canvas.height = bas;
-  pegsw = 29;
-  pegsw = 29;
+  pegsw = stdPegs;
+  pegsw = stdPegs;
 });
 
 btn2platta.addEventListener("click", function() {         // Denna triggar file browser vid klick på knapp
@@ -136,13 +128,7 @@ btnzoomneg.addEventListener("click", function() {         // Denna triggar file 
 
 function ScaleAndRedraw(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  //ctx.drawImage(image, currImgX , currImgY, image.width * currScale ,image.height * currScale , currImgX , currImgY, image.width, image.height);
-  ctx.drawImage(image, 0 , 0, image.width ,image.height , currImgX , currImgY, image.width * currScale, image.height * currScale);
-  //ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-  //currScale = 1;
-  
+  ctx.drawImage(image, 0 , 0, image.width ,image.height , currImgX , currImgY, image.width * currScale, image.height * currScale);  
 }
 
 fIn.addEventListener("change", function() {
@@ -161,9 +147,32 @@ if (file) {
 });
 
 
+    // --------------------Draw grid   -------------------------
+     function drawGrid() {
+       console.log("DrawGrid");
+      ctx = canvas.getContext("2d");
+      ctx.beginPath();
+      for (let x = 0; x < pegsw; x += 1) {
+        ctx.moveTo((x * pxBredd), 0);
+        ctx.lineTo((x * pxBredd), (pxBredd * pegsh));
+      }
+      
+      for (let y = 0;  y < pegsh; y += 1) {
+        ctx.moveTo(0, (y * pxBredd));
+        ctx.lineTo((pxBredd * pegsw), (y * pxBredd));
 
+      } 
+      ctx.stroke();
+     }
+    // ---------------------------------------------------------
+
+
+// ---------------------------------------- PEGIT START -------------------------------------
 function pegIt(){
   console.log<("Start of function - pegIt");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(image, 0 , 0, image.width ,image.height , currImgX , currImgY, image.width * currScale, image.height * currScale);
 
   pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -176,11 +185,12 @@ function pegIt(){
   console.log("Pixelation level" + pixelation_level);
   console.log("PegsW:" + pegsw + " PegsH:" + pegsh);
 
-  for (let x = 0; x < canvas.width; x += pixelation_level) {
-    for (let y = 0; y < canvas.height; y += pixelation_level) {
-      let trueColors = false;
+  for (let x = 12; x < canvas.width; x += pixelation_level) {
+    for (let y = 12 ; y < canvas.height; y += pixelation_level) {
+      
+      let trueColors = false; // Use table with colors if False, else found rgba value is used.
 
-      let i = (x + y * canvas.width) * 4;
+      let i = (x + y * (canvas.width)) * 4;
 
       let r = pixels.data[i + 0];
       let g = pixels.data[i + 1];
@@ -203,6 +213,12 @@ function pegIt(){
       console.log("Found: " + picColor + " Chose: " + choosenColor.hex + " " + choosenColor.name);
       
 
+      if (false){
+      // Pixel checking
+      ctx.fillStyle = "rgba("+255+","+0+","+0+","+1+")";
+      ctx.fillRect( x, y, 1, 1 );
+      }else{
+      
       // --------- Background for peg - White square ------------
       ctx.fillStyle = 'white';
       ctx.fillRect(x, y, pixelation_level,pixelation_level);
@@ -214,39 +230,39 @@ function pegIt(){
       ctx.fillStyle = 'rgba('+r+', '+g+', '+b+', '+a+')';
       ctx.strokeStyle = 'rgba('+r+', '+g+', '+b+', '+a+')';
       ctx.lineWidth = 2;
-      ctx.arc(x+startPeg, y+startPeg, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
+      ctx.arc(x/*+startPeg*/, y/*+startPeg*/, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.stroke();
       // ---------------------------------------------------------      
      }
 
      if (!trueColors) {
-
       var newrgb = hexToRgb(choosenColor.hex);
-
       // --------- Draw peg - Choosen color. -----------------------
       ctx.beginPath();
       ctx.fillStyle = 'rgba('+newrgb.r+', '+newrgb.g+', '+newrgb.b+',1)';
       ctx.strokeStyle = 'rgba('+newrgb.r+', '+newrgb.g+', '+newrgb.b+',1)';
       ctx.lineWidth = 2;
-      ctx.arc(x+startPeg, y+startPeg, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
+      ctx.arc(x/*+startPeg*/, y/*+startPeg*/, (pixelation_level/2)-1, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.stroke();
       // ---------------------------------------------------------  
      }
+
       // ----- Draw small peg to locate center with gray color.--
       ctx.beginPath();
       ctx.fillStyle = 'gray';
       ctx.strokeStyle = 'gray';
       ctx.lineWidth = 2;
-      ctx.arc(x+startPeg, y+startPeg, pixelation_level/6, 0, 2 * Math.PI, false);
+      ctx.arc(x/*+startPeg*/, y/*+startPeg*/, pixelation_level/6, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.stroke();
     // ---------------------------------------------------------
     }
+    }
   }
 };
-
+// ---------------------------------------- END OF PEGIT -------------------------------------
 
 //----------- Eventhandlers for moving picture-------------
 
@@ -307,6 +323,11 @@ canvas.addEventListener('mousemove', e => {
       
       ctx.drawImage(image, 0 , 0, image.width ,image.height , currImgX , currImgY, image.width * currScale, image.height * currScale);
       
+    // --------------------------------------------------------- 
+    // Draw the grid ontop of picture
+      drawGrid();
+    // ---------------------------------------------------------
+
       mstartX = e.pageX;
       mstartY = e.pageY;
     }
